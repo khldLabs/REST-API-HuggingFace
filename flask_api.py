@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import os
+import re
 import json
 from datetime import datetime
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -16,8 +17,18 @@ tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 ALLOWED_KEYS_DIR = "./allowed"
 MASTER_KEY = "KEY_HERE"
 
+def is_safe_key(api_key):
+    """Only allow simple keys (letters, numbers, _ and -).
+
+    Blocks anything else (like '/' or '..') so a key can never be used to
+    escape ALLOWED_KEYS_DIR and reach other files on disk (path traversal).
+    """
+    return bool(api_key) and re.fullmatch(r"[A-Za-z0-9_-]+", api_key) is not None
+
 def load_key_data(api_key):
     """Load API key data from JSON file."""
+    if not is_safe_key(api_key):
+        return None
     key_path = os.path.join(ALLOWED_KEYS_DIR, f"{api_key}.json")
     if os.path.exists(key_path):
         with open(key_path, 'r') as f:
@@ -26,6 +37,8 @@ def load_key_data(api_key):
 
 def save_key_data(api_key, data):
     """Save API key data to JSON file."""
+    if not is_safe_key(api_key):
+        return
     key_path = os.path.join(ALLOWED_KEYS_DIR, f"{api_key}.json")
     with open(key_path, 'w') as f:
         json.dump(data, f, indent=4)
@@ -41,6 +54,8 @@ def update_key_usage(api_key, ip):
 
 def is_valid_key(api_key):
     """Check if the provided API key is valid."""
+    if not is_safe_key(api_key):
+        return False
     return os.path.exists(os.path.join(ALLOWED_KEYS_DIR, f"{api_key}.json"))
 
 # Default generation parameters, change here.
