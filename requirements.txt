@@ -1,3 +1,14 @@
-flask
-transformers
-torch
+# Python dependencies for the Flask backend (flask_api.py).
+# Pinned for reproducible installs: `pip install -r requirements.txt`
+# Bump deliberately and re-test; don't float unpinned.
+
+flask==3.0.3
+transformers==4.44.2
+torch==2.4.1
+
+# Required by flask_api.py's `device_map="auto"` in from_pretrained.
+# Without accelerate, that argument raises ImportError at model load.
+accelerate==0.34.2
+
+# NOTE: the JavaScript client (client.js) depends on `axios` via npm,
+# which is NOT covered here. Install it separately with: npm install axios

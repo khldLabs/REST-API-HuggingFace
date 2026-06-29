@@ -1,0 +1,36 @@
+# --- Secrets / API-key store (NEVER commit) ---
+# The file-based key store: each file in here is a live API key + usage data.
+allowed/
+*.key
+.env
+.env.*
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.python-version
+
+# --- Model / cache artifacts (large, regenerable) ---
+# HuggingFace downloads models into a local cache; don't track them.
+.cache/
+*.safetensors
+*.bin
+*.pt
+
+# --- Node / JS client ---
+node_modules/
+npm-debug.log*
+package-lock.json
+
+# --- Editor / OS noise ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
