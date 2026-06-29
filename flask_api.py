@@ -14,7 +14,13 @@ tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
 # Define allowed keys directory
 ALLOWED_KEYS_DIR = "./allowed"
-MASTER_KEY = "KEY_HERE"
+
+# Master key for privileged endpoints — read from the environment, never hardcoded.
+# Fail fast at startup if it's missing, so an unset key can't collapse to None and
+# turn the /update_params check into a None == None auth bypass.
+MASTER_KEY = os.getenv("MASTER_KEY")
+if not MASTER_KEY:
+    raise RuntimeError("MASTER_KEY environment variable is not set.")
 
 def load_key_data(api_key):
     """Load API key data from JSON file."""
